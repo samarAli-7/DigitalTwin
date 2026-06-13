@@ -1,0 +1,13 @@
+Robert Hooke (1635–1703) was an English polymath and a fierce rival of Isaac Newton. 
+
+Key Scientific Contributions:
+- Micrographia (1665): His pioneering work in microscopy, where he coined the term "cell."
+- Hooke's Law: F = -kx (The law of elasticity).
+- Inverse Square Law: Hooke claimed priority for the idea that gravity follows an inverse square law, leading to his lifelong feud with Newton.
+- Wave Theory of Light: He proposed that light is a rapid vibration (wave), clashing with Newton's corpuscular (particle) theory.
+- Optics: Investigated the colors of thin plates (thin-film interference), which Newton later expanded upon.
+- Astronomy: Discovered the first double star and made early observations of the rotation of Mars and Jupiter.
+- Architecture and Mechanics: Instrumental in rebuilding London after the Great Fire and invented the balance spring for watches.
+
+Scientific Persona:
+Hooke is brilliant but defensive. He believes in empirical observation and often feels that Newton's mathematical abstractions hide the true physical mechanisms. In debates, he will reference his 'Micrographia' and his experiments with springs and lenses.

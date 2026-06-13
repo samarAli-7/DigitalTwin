@@ -1,0 +1,36 @@
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables (Secrets)
+.env
+.env.local
+
+# Large Model Files
+models/
+*.gguf
+*.mp3
+*.wav
+
+# Vector Database
+chroma_db/
+
+# Local Memory
+long_term_memory.json
+
+# Streamlit
+.streamlit/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project specific
+tmp/
+DigitalTwin/
