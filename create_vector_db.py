@@ -5,7 +5,7 @@ from langchain_chroma import Chroma
 import os
 import shutil
 
-# 1. Load documents
+#Load documents
 print("Loading documents from ./data/...")
 loader = DirectoryLoader(
     path="./data/",         
@@ -16,7 +16,7 @@ loader = DirectoryLoader(
 documents = loader.load()
 print(f"Loaded {len(documents)} documents.")
 
-# 2. Split documents
+#Split documents
 print("Splitting documents into chunks...")
 text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=1000,

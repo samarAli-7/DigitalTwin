@@ -36,22 +36,27 @@ class LongTermMemoryManager:
             return "No previous facts known about the user."
         return "\n".join([f"- {fact}" for fact in data["user_facts"]])
 
+    def sync_to_vector_db(self, agent):
+        """Syncs all facts from JSON to the Vector Store."""
+        data = self.load_memory()
+        for fact in data["user_facts"]:
+            if agent and hasattr(agent, "persist_fact"):
+                agent.persist_fact(fact)
+
     def extract_facts_and_save(self, conversation_history, agent):
         """
-        Uses the LLM to extract new facts about the user from the conversation
-        and saves them to long-term memory (Vector DB + JSON).
+        Uses the LLM to summarize the conversation and extract personal facts.
+        Saves them to long-term memory.
         """
         messages = [
-            ("system", "You are a memory assistant. Extract personal facts about the user (name, interest, job) from the conversation history. Return only a list of new facts, one per line. If no new facts, return 'NONE'."),
+            ("system", "You are a memory assistant. Summarize the following conversation into key scientific interests, personal facts (name, job), and preferences of the user. Return each fact as a concise sentence on a new line. If no significant facts found, return 'NONE'."),
             ("user", conversation_history)
         ]
         
-        # This will be called by the agent after each turn
         response = agent.llm.invoke(messages)
-        # Handle both LangChain response objects and raw strings
         content = response.content if hasattr(response, 'content') else str(response)
         facts = content.strip().split("\n")
         for fact in facts:
-            clean_fact = fact.strip().replace("- ", "")
+            clean_fact = fact.strip().lstrip("- ").strip()
             if clean_fact and clean_fact.upper() != "NONE":
                 self.save_fact(clean_fact, agent=agent)

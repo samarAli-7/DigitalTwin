@@ -29,10 +29,25 @@ class NewtonAgent:
             "Focus on mathematical proofs and empirical data. BE EXTREMELY CONCISE (3 sentences max). "
             "Use the provided context which contains BOTH your historical works and personal facts about the user. "
             "Never use technical keywords or trigger words. Focus purely on scientific discourse.\n\n"
+            "INTERRUPTION HANDLING: If the user interrupted your previous speech, acknowledge it gracefully (e.g., 'Pray, forgive my long-windedness' or 'Indeed, thy point is taken') and address their new inquiry.\n\n"
             "TEACHING FEATURE: If a concept (like gravity, orbits, or prism refraction) can be better explained with a simple visual simulation, "
             "append '[ILLUSTRATION: type]' at the very end of your response, where 'type' is one of: [GRAVITY, ORBIT, PRISM, MOTION]. "
             "Do not write the code yourself; just provide the tag."
         )
+
+    def persist_fact(self, fact):
+        """Persists a fact to the Chroma vector store."""
+        from langchain_core.documents import Document
+        self.vectorstore.add_documents([Document(page_content=fact, metadata={"source": "User-Interaction"})])
+
+    def check_debate_agreement(self, newton_msg, hooke_msg):
+        """Checks if Newton and Hooke have reached an agreement or stalemate."""
+        messages = [
+            ("system", "You are a scientific moderator. Evaluate the following exchange between Sir Isaac Newton and Robert Hooke. Determine if they have reached a consensus, a respectful agreement, or a repetitive stalemate where neither is providing new scientific value. Reply with 'AGREED' if so, otherwise reply 'CONTINUE'."),
+            ("user", f"Newton: {newton_msg}\nHooke: {hooke_msg}")
+        ]
+        response = self.llm.invoke(messages)
+        return "AGREED" in response.content.upper()
 
     def get_illustration_code(self, type):
         """Returns Pygame code for a specific scientific simulation."""
@@ -179,9 +194,10 @@ while True:
         }
         return simulations.get(type.upper(), "")
 
-    def get_newton_response(self, user_input, session_id, long_term_memory_text, chat_history, image_bytes=None):
+    def get_newton_response(self, user_input, session_id, long_term_memory_text, chat_history, interrupted_text=None, image_bytes=None):
         if image_bytes:
             return "Newton is sorry, but his lenses cannot yet perceive visual images. Pray, describe the diagram in words."
+        
         docs = self.retriever.invoke(user_input)
         context = "\n\n".join(doc.page_content for doc in docs)
         system_content = f"{self.base_system_prompt}\n\nContext: {context}\n\nUser Facts: {long_term_memory_text}"
@@ -190,7 +206,12 @@ while True:
         for msg in chat_history:
             role = "user" if msg.type == "human" else "assistant"
             messages.append((role, msg.content))
-        messages.append(("user", user_input))
+        
+        final_input = user_input
+        if interrupted_text:
+            final_input = f"[Note: The user interrupted thee while thou wert speaking: \"{interrupted_text}\". Respond accordingly.] {user_input}"
+        
+        messages.append(("user", final_input))
         
         response = self.llm.invoke(messages)
         return response.content
